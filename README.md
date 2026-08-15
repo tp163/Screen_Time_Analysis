@@ -61,16 +61,18 @@ The key takeaway is that high screen time is driven mainly by **how often users 
 
 ## Limitations
 
-- Class imbalance may bias the model toward predicting High.
 - Weak MI scores for most features suggest limited predictive signal.
 - Country is a coarse proxy that may hide culture, internet access, and economic conditions.
 
-## Future Work
+## Outcomes
 
-- Balance classes with SMOTE oversampling.
-- Add richer behavioural features.
-- Use SHAP for deeper explainability.
-- Tune layers, neurons, dropout rate, and learning rate.
+The dataset shows that high screen time is observed across all countries and demographics. Typical users are adults with **17–18 weekly sessions** and **42–44 minutes per session**. They often use 2–4 platforms (e.g., Amazon Prime Video, Instagram, Netflix, Disney+, TikTok) and have diverse internet connections (Broadband, 4G LTE, 5G, ADSL). Content preferences vary widely (Action, Documentary, Horror, Sports, Animation, Drama).
+
+For example:
+- An adult male from Australia watches **Documentary** on **Amazon Prime Video** (Desktop, Basic plan), with 18 weekly sessions (~44 min each), using 3 platforms and 4G LTE.
+- An adult male from Brazil watches **Sports** on **Instagram** (Tablet, Free plan), with 18 weekly sessions (~43 min each), using 3 platforms and 5G.
+
+These profiles illustrate that **high screen time is driven more by usage frequency and regional/age factors than by content or device type** (as confirmed by the feature selection in this project).
 
 ## Repository Contents
 
