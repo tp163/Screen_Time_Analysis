@@ -1,59 +1,82 @@
 # Screen Time Behaviour Analysis
 
-A data mining project that classifies daily screen-time behaviour as **Low**, **Moderate**, or **High** using a neural-network model.
+This data mining project investigates why some users have high daily video screen time compared with others. It has two goals: **prediction** (classify users as Moderate or High) and **explanation** (identify the factors driving high screen time).
 
-## Objective
+## Problem Statement
 
-Predict a user's daily screen-time category from demographic, viewing, device, platform, and session-related attributes.
-
-The target categories are:
-
-- **Low:** 3 hours or less per day
-- **Moderate:** more than 3 and up to 6 hours per day
-- **High:** more than 6 hours per day
+The central research question is: *What are the main factors that increase daily screen time?* The analysis tests user background, watching behaviour, platform usage, device type, subscription type, content category, and internet connection.
 
 ## Dataset
 
-The project uses `Global_Video_Screen_Time_Analysis_20000_Rows.csv`, which contains 20,000 video screen-time records and 16 attributes. Example variables include country, age group, gender, viewing hour, content category, device type, subscription type, platform, weekly sessions, session duration, and internet connection.
+The project uses 20,000 user records with 14 input attributes: Country, Age Group, Gender, Peak Viewing Hour, Content Category, Device Type, Subscription Type, Platform, Weekly Sessions, Average Session Duration, Number of Platforms Used, Internet Connection, Content Language, and Binge Watch Frequency.
 
-## Workflow
+The target variable is `Daily_Screen_Time_Hours`, binned into **Moderate** and **High**. No Low-screen-time users existed in this dataset.
 
-The notebook follows this machine-learning workflow:
+## Exploratory Data Analysis
 
-1. Exploratory data analysis and correlation analysis
-2. Encoding categorical variables
-3. Mutual-information feature selection to retain the six most informative features
-4. Feature scaling with `StandardScaler`
-5. Stratified 80/20 train-test split
-6. Neural-network training with L2 regularisation and 30% dropout
-7. Validation and overfitting checks
-8. Evaluation using a confusion matrix, accuracy, precision, recall, F1 score, and error rate
-9. Country-level summaries and profiles of screen-time behaviour
+The target classes are imbalanced: **High 75.7%** and **Moderate 24.3%**. Plain accuracy can therefore be misleading because a model predicting High for every user could still appear reasonably accurate. Numeric features showed weak correlations overall, indicating low redundancy and minimal multicollinearity.
 
-## Model
+## Feature Selection with Mutual Information
 
-The classifier uses a feed-forward neural network with the following architecture:
+Mutual Information (MI) was used because it can detect non-linear dependencies as well as linear ones.
 
-`Input (6 selected features) → Dense (128) → Dense (64) → Dense (32) → Softmax output (3 classes)`
+| Feature | MI score |
+|---|---:|
+| Weekly Sessions | 0.186 |
+| Country | 0.140 |
+| Age Group | 0.101 |
+| Other features | < 0.006 |
 
-L2 regularisation and dropout are used to help reduce overfitting.
+The six selected features were **Weekly Sessions, Country, Age Group, Platform, Content Language,** and **Number of Platforms**. This reduces noise and model complexity.
+
+## Neural Network Model
+
+A neural network was chosen to model complex, non-linear interactions in the 20,000-record dataset. The model uses 30% dropout and L2 regularisation to encourage generalisation. Data was split into 80% training and 20% validation-test data and trained for 10 epochs. Validation accuracy plateaued around epochs 8–10 and the train/validation gap stayed under 5%, indicating no clear overfitting.
+
+## Evaluation
+
+- Confusion-matrix accuracy: **96.2%**
+- Classification-report accuracy: **84.85%**
+- Precision: **0.8455**
+- Recall: **0.8485**
+- F1 score: **0.8467**
+- Error rate: **15.15%**
+
+The model performs better on High (precision **0.89**, recall **0.91**) than Moderate (precision **0.70**, recall **0.66**), as expected from the class imbalance.
+
+> **Important:** The 96.2% confusion-matrix accuracy and 84.85% classification-report accuracy do not match. These results should be double-checked before being used in a final presentation.
+
+## Cause Analysis
+
+- **Weekly Sessions:** High users average 18.4 sessions/week versus 12.5 for Moderate users, making this the strongest behavioural signal.
+- **Binge Watch Frequency:** Distributions are nearly identical, so it is not a meaningful driver.
+- **Country:** The second-strongest factor, reflecting viewing habits across 44 countries.
+- **Age Group:** Younger users tend to be more represented in the High category.
+
+## Final Findings
+
+The primary drivers of High screen time are **Weekly Sessions, Country,** and **Age Group**. Platform, Content Category, Device Type, Subscription Type, Internet Connection, Content Language, Peak Viewing Hour, and Binge Watch Frequency showed minimal influence in this analysis.
+
+The key takeaway is that high screen time is driven mainly by **how often users open the app** and **who they are or where they are from**, rather than by what they watch or which device or platform they use.
+
+## Limitations
+
+- Class imbalance may bias the model toward predicting High.
+- Weak MI scores for most features suggest limited predictive signal.
+- Country is a coarse proxy that may hide culture, internet access, and economic conditions.
+
+## Future Work
+
+- Balance classes with SMOTE oversampling.
+- Add richer behavioural features.
+- Use SHAP for deeper explainability.
+- Tune layers, neurons, dropout rate, and learning rate.
 
 ## Repository Contents
 
-- `ScreenTime_Analysis.ipynb` — complete analysis, visualisations, model training, and evaluation
+- `ScreenTime_Analysis.ipynb` — complete analysis, visualisations, model training, evaluation, and cause analysis
 - `Global_Video_Screen_Time_Analysis_20000_Rows.csv` — dataset used by the notebook
-
-## Requirements
-
-Run the notebook with Python and install the packages it imports, including:
-
-```bash
-pip install pandas numpy matplotlib seaborn scikit-learn tensorflow jupyter
-```
 
 ## How to Run
 
-1. Clone this repository.
-2. Install the required packages.
-3. Open `ScreenTime_Analysis.ipynb` in Jupyter Notebook or VS Code.
-4. Run all cells in order.
+Open `ScreenTime_Analysis.ipynb` in Jupyter Notebook or VS Code and run the cells in order. The notebook uses pandas, NumPy, Matplotlib, Seaborn, scikit-learn, and TensorFlow/Keras.
